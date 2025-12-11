@@ -210,7 +210,7 @@
       const res = await fetch("/api/log-today", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, childId: CHILD_ID }),
+              body: JSON.stringify({ rawText: text, childId: CHILD_ID }),
       });
       const data = await res.json();
 
