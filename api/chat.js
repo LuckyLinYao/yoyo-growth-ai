@@ -60,7 +60,8 @@ module.exports = async function handler(req, res) {
     const { messages } = await parseJsonBody(req);
 
     const completion = await client.chat.completions.create({
-      model: "gpt-5.1-mini",
+model: "gpt-4o-mini",
+
       messages: [
         { role: "system", content: YOYO_SYSTEM_PROMPT },
         ...(messages || []),
