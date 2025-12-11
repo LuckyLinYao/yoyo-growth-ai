@@ -61,15 +61,16 @@ module.exports = async function handler(req, res) {
     }
 
     // 1. 用小模型整理文字 + 打标签（JSON 模式）
-    const completion = await client.chat.completions.create({
-      model: "gpt-5.1-mini",
-      messages: [
-        { role: "system", content: LOG_SYSTEM_PROMPT },
-        { role: "user", content: rawText },
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: 300,
-    });
+   const completion = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [
+    { role: "system", content: LOG_SYSTEM_PROMPT },
+    { role: "user", content: rawText },
+  ],
+  response_format: { type: "json_object" },
+  max_tokens: 300,
+});
+
 
     let cleaned = rawText;
     let tags = [];
