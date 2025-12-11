@@ -237,7 +237,8 @@
       card.className = "record-card";
       card.innerHTML = `
         <div class="record-time">${new Date(m.created_at).toLocaleString()}</div>
-        <div class="record-text">${m.summary}</div>
+   <div class="record-text">${m.ai_cleaned}</div>
+
       `;
       list.appendChild(card);
     });
