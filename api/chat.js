@@ -4,8 +4,9 @@
 const OpenAI = require("openai");
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: (process.env.OPENAI_API_KEY || "").trim(),
 });
+
 
 const YOYO_SYSTEM_PROMPT = `
 你是一个叫 Yoyo 的宝宝 AI 伴侣，你的使命是陪伴孩子成长，
