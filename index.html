@@ -165,13 +165,25 @@
   <div id="chatPage" class="page active">
     <div id="chatContainer"></div>
 
-    <div class="input-area">
-      <input id="userInput" type="text" placeholder="对 Yoyo 说点什么…" />
-      <button onclick="sendMessage()">发送</button>
-    </div>
+  <div class="input-area">
+  <input id="userInput" type="text" placeholder="对 Yoyo 说点什么…" />
+  <button onclick="sendMessage()">发送</button>
+</div>
 
-    <button id="saveBtn" onclick="saveToday()">保存今日成长记录</button>
-  </div>
+<!-- 保存按钮（固定在输入框下方） -->
+<div style="padding: 0 8px;">
+  <button id="saveBtn" onclick="saveToday()" style="
+    width: 100%;
+    background: #ffbf4c;
+    margin-top: 6px;
+    font-size: 17px;
+    padding: 12px 0;
+    border-radius: 12px;
+  ">
+    🌼 保存今日成长记录
+  </button>
+</div>
+
 
   <!-- 成长记录页面 -->
   <div id="recordsPage" class="page">
