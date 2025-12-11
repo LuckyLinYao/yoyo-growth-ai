@@ -59,16 +59,16 @@ module.exports = async function handler(req, res) {
   try {
     const { messages } = await parseJsonBody(req);
 
-    const completion = await client.chat.completions.create({
-model: "gpt-4o-mini",
+   const completion = await client.chat.completions.create({
+  model: "gpt-4o",
+  messages: [
+    { role: "system", content: YOYO_SYSTEM_PROMPT },
+    ...(messages || []),
+  ],
+  temperature: 0.7,
+  max_tokens: 512,
+});
 
-      messages: [
-        { role: "system", content: YOYO_SYSTEM_PROMPT },
-        ...(messages || []),
-      ],
-      temperature: 0.7,
-      max_tokens: 512,
-    });
 
     const reply =
       completion.choices?.[0]?.message?.content || "Yoyo 在想一想…";
