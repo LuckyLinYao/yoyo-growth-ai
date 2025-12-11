@@ -1,0 +1,8 @@
+{
+  "name": "yoyo-growth-ai",
+  "version": "1.0.0",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.0",
+    "openai": "^4.0.0"
+  }
+}
