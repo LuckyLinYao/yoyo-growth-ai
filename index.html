@@ -2,465 +2,279 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>Yoyo 成长 AI 伴侣</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yoyo · 宝宝成长伙伴</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 16px;
-    }
-    .app {
-      width: 100%;
-      max-width: 900px;
-      background: #ffffff;
-      border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      background: #fff8e7;
       display: flex;
       flex-direction: column;
+      height: 100vh;
       overflow: hidden;
     }
+
+    /* 顶部标题栏 */
     .header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #ffe8a3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #ffe3a3;
+      padding: 14px;
+      text-align: center;
       font-weight: bold;
       font-size: 20px;
-    }
-    .title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-    .subtitle {
-      font-size: 12px;
-      color: #666;
-    }
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-    }
-    .badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #ffb84d;
-      background: #fff7e6;
-      color: #b36b00;
+      color: #8a5d00;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
     }
 
-    .main {
+    /* TAB 切换栏 */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
       display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    @media (min-width: 800px) {
-      .main {
-        flex-direction: row;
-      }
+      background: #ffe7ba;
+      border-top: 1px solid #f3d686;
     }
 
-    .chat-panel {
-      flex: 2;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid #f0f0f0;
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 16px;
+      color: #8a5d00;
     }
-    .chat-messages {
-      padding: 16px;
-      height: 55vh;
-      min-height: 300px;
+
+    .tab.active {
+      background: #ffd57a;
+      font-weight: bold;
+      color: #6d4800;
+    }
+
+    /* 页面容器 */
+    .page {
+      flex: 1;
+      display: none;
       overflow-y: auto;
-      background: #fafafa;
+      padding: 12px;
     }
+
+    .page.active {
+      display: block;
+    }
+
+    /* 聊天气泡 */
     .message {
-      display: flex;
-      margin-bottom: 12px;
-    }
-    .message.yoyo {
-      justify-content: flex-start;
-    }
-    .message.user {
-      justify-content: flex-end;
-    }
-    .bubble {
+      margin-bottom: 10px;
       max-width: 80%;
       padding: 10px 14px;
-      border-radius: 18px;
-      font-size: 14px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      border-radius: 14px;
+      line-height: 1.4;
+      word-break: break-word;
     }
-    .message.yoyo .bubble {
-      background: #fff4d6;
-      border-bottom-left-radius: 4px;
-    }
-    .message.user .bubble {
-      background: #d2eaff;
+
+    .user {
+      background: #ffe9c3;
+      align-self: flex-end;
       border-bottom-right-radius: 4px;
     }
-    .chat-input {
-      padding: 10px 12px;
-      border-top: 1px solid #eee;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: #fff;
-    }
-    .chat-input-row {
-      display: flex;
-      gap: 8px;
-    }
-    .chat-input textarea {
-      flex: 1;
-      resize: none;
-      border-radius: 18px;
-      border: 1px solid #ddd;
-      padding: 8px 12px;
-      font-size: 14px;
-      max-height: 80px;
-    }
-    .chat-input button {
-      padding: 0 16px;
-      border-radius: 18px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      background: #ffb84d;
-    }
-    .chat-input button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .chat-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-    .chat-actions button {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fafafa;
+
+    .bot {
+      background: #fff4d1;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
     }
 
-    .side-panel {
-      flex: 1.4;
+    /* 聊天容器 */
+    #chatContainer {
       display: flex;
       flex-direction: column;
-      min-height: 260px;
-    }
-    .side-header {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 13px;
-      font-weight: 500;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .side-body {
-      padding: 10px 14px;
-      font-size: 12px;
       overflow-y: auto;
-      height: 55vh;
-      min-height: 200px;
-    }
-    .moment {
+      height: calc(100vh - 200px);
       margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed #eee;
-    }
-    .moment-date {
-      font-size: 11px;
-      color: #999;
-      margin-bottom: 4px;
-    }
-    .moment-text {
-      font-size: 12px;
-    }
-    .moment-tags {
-      margin-top: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-    .tag {
-      padding: 1px 6px;
-      border-radius: 999px;
-      background: #f0f0f0;
-      font-size: 10px;
-      color: #666;
     }
 
-    .status {
-      font-size: 11px;
-      color: #999;
-      padding: 4px 16px 8px;
+    /* 输入区 */
+    .input-area {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      background: #fff7dc;
+      border-top: 1px solid #f3d686;
     }
-    .side-status {
-      font-size: 11px;
-      color: #999;
+
+    #userInput {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #d9c08b;
+      font-size: 16px;
     }
+
+    button {
+      background: #ffcf6f;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 16px;
+      color: #6d4800;
+      font-weight: bold;
+    }
+
+    #saveBtn {
+      margin-top: 8px;
+      width: 100%;
+      background: #ffc652;
+    }
+
+    /* 成长记录卡片 */
+    .record-card {
+      background: #fff4cf;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #f1d9a5;
+    }
+
+    .record-time {
+      font-size: 12px;
+      color: #a67c00;
+      margin-bottom: 6px;
+    }
+
+    .record-text {
+      font-size: 15px;
+      color: #5b4300;
+      white-space: pre-line;
+    }
+
+    #refreshBtn {
+      margin: 10px 0;
+      width: 100%;
+      background: #ffd57a;
+    }
+
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="header">
-      <div class="header-left">
-        <div class="avatar">Y</div>
-        <div>
-          <div class="title">Yoyo 成长 AI 伴侣</div>
-          <div class="subtitle">自信 · 独立 · 开朗 · 阳光</div>
-        </div>
-      </div>
-      <div class="header-right">
-        <span class="badge">成长记录实验版</span>
-        <span class="side-status" id="globalStatus"></span>
-      </div>
+  <div class="header">🐥 Yoyo · 宝宝成长伙伴</div>
+
+  <!-- 聊天页面 -->
+  <div id="chatPage" class="page active">
+    <div id="chatContainer"></div>
+
+    <div class="input-area">
+      <input id="userInput" type="text" placeholder="对 Yoyo 说点什么…" />
+      <button onclick="sendMessage()">发送</button>
     </div>
 
-    <div class="main">
-      <!-- 左侧：聊天 -->
-      <div class="chat-panel">
-        <div id="messages" class="chat-messages"></div>
-        <div id="status" class="status"></div>
-        <div class="chat-input">
-          <div class="chat-input-row">
-            <textarea id="input" rows="1" placeholder="对 Yoyo 说点什么，或者帮孩子记一条今天的成长瞬间…"></textarea>
-            <button id="sendBtn">发送</button>
-          </div>
-          <div class="chat-actions">
-            <button id="saveBtn">保存为今天的成长记录</button>
-          </div>
-        </div>
-      </div>
+    <button id="saveBtn" onclick="saveToday()">保存今日成长记录</button>
+  </div>
 
-      <!-- 右侧：最近成长记录 -->
-      <div class="side-panel">
-        <div class="side-header">
-          <span>最近成长记录</span>
-          <button id="refreshMomentsBtn" style="font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid #ddd;background:#fff;">
-            刷新
-          </button>
-        </div>
-        <div class="side-body" id="momentsList">
-          <div style="font-size:12px;color:#999;">还没有记录。你可以先在左边写一段“今天宝宝的情况”，然后点“保存为今天的成长记录”。</div>
-        </div>
-      </div>
-    </div>
+  <!-- 成长记录页面 -->
+  <div id="recordsPage" class="page">
+    <button id="refreshBtn" onclick="loadRecords()">🔄 刷新成长记录</button>
+    <div id="recordsList"></div>
+  </div>
+
+  <!-- TAB -->
+  <div class="tab-bar">
+    <div id="tabChat" class="tab active" onclick="switchTab('chat')">🗨 聊天</div>
+    <div id="tabRecords" class="tab" onclick="switchTab('records')">📘 成长记录</div>
   </div>
 
   <script>
-    const messagesEl = document.getElementById("messages");
-    const inputEl = document.getElementById("input");
-    const sendBtn = document.getElementById("sendBtn");
-    const saveBtn = document.getElementById("saveBtn");
-    const statusEl = document.getElementById("status");
-    const globalStatusEl = document.getElementById("globalStatus");
-    const momentsListEl = document.getElementById("momentsList");
-    const refreshMomentsBtn = document.getElementById("refreshMomentsBtn");
+  const CHILD_ID = "e4b85853-91bb-4aaf-bd44-3b5d468df12c";
 
-    // TODO: 这里后面会换成你在数据库里 children 表的那条 id
-    const CHILD_ID = "48f9bb41-41ed-4c95-abaa-71b5adee4b23";
+    const chatContainer = document.getElementById("chatContainer");
 
-    let chatHistory = [];
-
-    function addMessage(role, text) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "message " + (role === "assistant" ? "yoyo" : "user");
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = text;
-
-      wrapper.appendChild(bubble);
-      messagesEl.appendChild(wrapper);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = "message " + sender;
+      div.textContent = text;
+      chatContainer.appendChild(div);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
     async function sendMessage() {
-      const text = inputEl.value.trim();
+      const text = document.getElementById("userInput").value.trim();
       if (!text) return;
 
-      addMessage("user", text);
-      chatHistory.push({ role: "user", content: text });
-      inputEl.value = "";
-      inputEl.style.height = "auto";
-
-      sendBtn.disabled = true;
-      statusEl.textContent = "Yoyo 正在思考…";
+      addMessage(text, "user");
+      document.getElementById("userInput").value = "";
 
       try {
-        const resp = await fetch("/api/chat", {
+        const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: chatHistory }),
+          body: JSON.stringify({ text, childId: CHILD_ID }),
         });
 
-        const data = await resp.json();
-
-        if (data.reply) {
-          addMessage("assistant", data.reply);
-          chatHistory.push({ role: "assistant", content: data.reply });
-        } else {
-          addMessage("assistant", "Yoyo 有点累了，稍后再试试。");
-        }
-      } catch (e) {
-        console.error(e);
-        addMessage("assistant", "网络好像有点问题，等会儿再试试。");
-      } finally {
-        sendBtn.disabled = false;
-        statusEl.textContent = "";
+        const data = await res.json();
+        addMessage(data.reply || "Yoyo 有点累了，请稍后再试~", "bot");
+      } catch (err) {
+        addMessage("网络好像开小差了，请稍后再试！", "bot");
       }
     }
 
-    async function saveTodayMoment() {
-      const rawText = inputEl.value.trim();
-      if (!rawText) {
-        alert("请先在左边输入框写一段今天宝宝的情况，再点击保存。");
+    async function saveToday() {
+      const text = document.getElementById("userInput").value.trim();
+      if (!text) {
+        alert("请输入今天想记录的内容！");
         return;
       }
-      if (CHILD_ID === "REPLACE_WITH_CHILD_ID") {
-        alert("还没配置 CHILD_ID（孩子 ID），后端接好数据库后再启用保存功能。");
-        return;
-      }
-
-      saveBtn.disabled = true;
-      globalStatusEl.textContent = "正在保存今天的成长记录…";
 
       try {
-        const resp = await fetch("/api/log-today", {
+        const res = await fetch("/api/log-today", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            childId: CHILD_ID,
-            rawText,
-            happenedAt: new Date().toISOString()
-          }),
+          body: JSON.stringify({ text, childId: CHILD_ID }),
         });
 
-        const data = await resp.json();
+        const data = await res.json();
         if (data.ok) {
           alert("保存成功！");
-          inputEl.value = "";
-          inputEl.style.height = "auto";
-          await loadRecentMoments();
+          loadRecords();
         } else {
-          console.error(data);
           alert("保存失败，可以稍后再试。");
         }
       } catch (e) {
-        console.error(e);
-        alert("网络或服务器异常，稍后重试。");
-      } finally {
-        saveBtn.disabled = false;
-        globalStatusEl.textContent = "";
+        alert("保存失败，可以稍后再试！");
       }
     }
 
-    async function loadRecentMoments() {
-      globalStatusEl.textContent = "正在加载最近记录…";
-      try {
-        const resp = await fetch("/api/recent-moments?childId=" + encodeURIComponent(CHILD_ID));
-        const data = await resp.json();
+    async function loadRecords() {
+      const res = await fetch("/api/recent-moments?childId=" + CHILD_ID);
+      const data = await res.json();
 
-        momentsListEl.innerHTML = "";
+      const list = document.getElementById("recordsList");
+      list.innerHTML = "";
 
-        if (!data.moments || data.moments.length === 0) {
-          momentsListEl.innerHTML = '<div style="font-size:12px;color:#999;">最近还没有记录。</div>';
-          globalStatusEl.textContent = "";
-          return;
-        }
+      data.moments.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "record-card";
 
-        data.moments.forEach(m => {
-          const item = document.createElement("div");
-          item.className = "moment";
+        card.innerHTML = `
+          <div class="record-time">${new Date(m.created_at).toLocaleString()}</div>
+          <div class="record-text">${m.summary}</div>
+        `;
 
-          const dateEl = document.createElement("div");
-          dateEl.className = "moment-date";
-          const dt = new Date(m.happened_at);
-          dateEl.textContent = dt.toLocaleString();
-
-          const textEl = document.createElement("div");
-          textEl.className = "moment-text";
-          textEl.textContent = m.ai_cleaned || m.raw_text;
-
-          item.appendChild(dateEl);
-          item.appendChild(textEl);
-
-          if (m.tags && m.tags.length > 0) {
-            const tagsEl = document.createElement("div");
-            tagsEl.className = "moment-tags";
-            m.tags.forEach(t => {
-              const tag = document.createElement("span");
-              tag.className = "tag";
-              tag.textContent = t;
-              tagsEl.appendChild(tag);
-            });
-            item.appendChild(tagsEl);
-          }
-
-          momentsListEl.appendChild(item);
-        });
-
-        globalStatusEl.textContent = "";
-      } catch (e) {
-        console.error(e);
-        momentsListEl.innerHTML = '<div style="font-size:12px;color:#999;">加载失败，可以稍后点击“刷新”再试。</div>';
-        globalStatusEl.textContent = "";
-      }
+        list.appendChild(card);
+      });
     }
 
-    sendBtn.addEventListener("click", sendMessage);
-    saveBtn.addEventListener("click", saveTodayMoment);
-    refreshMomentsBtn.addEventListener("click", loadRecentMoments);
+    function switchTab(tab) {
+      document.getElementById("chatPage").classList.toggle("active", tab === "chat");
+      document.getElementById("recordsPage").classList.toggle("active", tab === "records");
 
-    inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
+      document.getElementById("tabChat").classList.toggle("active", tab === "chat");
+      document.getElementById("tabRecords").classList.toggle("active", tab === "records");
+    }
 
-    inputEl.addEventListener("input", () => {
-      inputEl.style.height = "auto";
-      inputEl.style.height = Math.min(inputEl.scrollHeight, 80) + "px";
-    });
-
-    // 初始欢迎语
-    addMessage("assistant", "嗨，我是 Yoyo～以后我会陪着你和宝宝慢慢长大。你可以先跟我说说：宝宝现在在第几周了？");
-    chatHistory.push({
-      role: "assistant",
-      content: "嗨，我是 Yoyo～以后我会陪着你和宝宝慢慢长大。你可以先跟我说说：宝宝现在在第几周了？"
-    });
+    // 初次加载时自动拉取记录
+    loadRecords();
   </script>
 </body>
 </html>
