@@ -58,6 +58,8 @@ module.exports = async function handler(req, res) {
 
   try {
     const { messages } = await parseJsonBody(req);
+    console.log("🧸 incoming messages:", JSON.stringify(messages, null, 2));
+
 
    const completion = await client.chat.completions.create({
   model: "gpt-4o",
