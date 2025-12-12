@@ -167,6 +167,9 @@
 
 <script>
   const CHILD_ID = "48f9bb41-41ed-4c95-abaa-71b5adee4b23";
+const chatHistory = [];
+// 可选：刷新不丢聊天（想要就保留，不想要可删）
+// const chatHistory = JSON.parse(localStorage.getItem("yoyo_chat") || "[]");
 
   // 聊天 UI
   const chatContainer = document.getElementById("chatContainer");
@@ -179,26 +182,39 @@
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  async function sendMessage() {
-    const text = document.getElementById("userInput").value.trim();
-    if (!text) return;
+ async function sendMessage() {
+  const text = document.getElementById("userInput").value.trim();
+  if (!text) return;
 
-    addMessage(text, "user");
-    document.getElementById("userInput").value = "";
+  addMessage(text, "user");
+  document.getElementById("userInput").value = "";
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, childId: CHILD_ID }),
-      });
+  // 1) 记录用户消息（关键）
+  chatHistory.push({ role: "user", content: text });
 
-      const data = await res.json();
-      addMessage(data.reply || "Yoyo 有点累了，请稍后再试~", "bot");
-    } catch {
-      addMessage("网络开小差了，请稍后再试~", "bot");
-    }
+  try {
+    // 2) 发 messages 给后端（关键）
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: chatHistory, childId: CHILD_ID }),
+    });
+
+    const data = await res.json();
+    const reply = data.reply || "Yoyo 有点累了，请稍后再试~";
+
+    addMessage(reply, "bot");
+
+    // 3) 记录助手回复（关键）
+    chatHistory.push({ role: "assistant", content: reply });
+
+    // 可选：刷新不丢聊天
+    // localStorage.setItem("yoyo_chat", JSON.stringify(chatHistory));
+  } catch {
+    addMessage("网络开小差了，请稍后再试~", "bot");
   }
+}
+
 
   async function saveToday() {
     const text = document.getElementById("userInput").value.trim();
